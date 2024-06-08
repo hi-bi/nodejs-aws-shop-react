@@ -14,7 +14,9 @@ export class ShopSiteStack extends cdk.Stack {
       bucketName: "bv-eu-north-1-rss-2",
       websiteIndexDocument: "index.html",
       publicReadAccess: false,
-      blockPublicAccess: cdk.aws_s3.BlockPublicAccess.BLOCK_ALL
+      blockPublicAccess: cdk.aws_s3.BlockPublicAccess.BLOCK_ALL,
+      removalPolicy: cdk.RemovalPolicy.DESTROY,
+      autoDeleteObjects: true
     } )
 
     siteBucket.addToResourcePolicy(new cdk.aws_iam.PolicyStatement({
