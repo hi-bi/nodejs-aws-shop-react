@@ -40,7 +40,7 @@ export class ShopSiteStack extends cdk.Stack {
     })
 
     new cdk.aws_s3_deployment.BucketDeployment(this, "SiteShop-Bucket-Deployment", {
-      sources: [cdk.aws_s3_deployment.Source.asset("../../dist")],
+      sources: [cdk.aws_s3_deployment.Source.asset("../dist")],
       destinationBucket: siteBucket,
       distribution: distribution,
       distributionPaths: ["/*"]
