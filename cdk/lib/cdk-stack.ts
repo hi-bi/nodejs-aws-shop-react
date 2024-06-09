@@ -1,6 +1,9 @@
 import * as cdk from 'aws-cdk-lib';
+import * as s3 from 'aws-cdk-lib/aws-s3';
+import * as cloudfront from 'aws-cdk-lib/aws-cloudfront';
+import * as iam from 'aws-cdk-lib/aws-iam';
+import * as s3deployment from 'aws-cdk-lib/aws-s3-deployment';
 import { Construct } from 'constructs';
-// import * as sqs from 'aws-cdk-lib/aws-sqs';
 
 export class ShopSiteStack extends cdk.Stack {
   constructor(scope: Construct, id: string, props?: cdk.StackProps) {
@@ -8,24 +11,24 @@ export class ShopSiteStack extends cdk.Stack {
 
     // The code that defines your stack goes here
 
-    const cloudFrontOAI = new cdk.aws_cloudfront.OriginAccessIdentity(this, "ShopSite-OAI")
-
-    const siteBucket = new cdk.aws_s3.Bucket( this, "ShopSite-Bucket", {
-      bucketName: "bv-eu-north-1-rss-2",
+    const siteBucket = new s3.Bucket( this, "ShopSite-Bucket", {
+      bucketName: "bv-eu-north-1-rss-221",
       websiteIndexDocument: "index.html",
       publicReadAccess: false,
-      blockPublicAccess: cdk.aws_s3.BlockPublicAccess.BLOCK_ALL,
+      blockPublicAccess: s3.BlockPublicAccess.BLOCK_ALL,
       removalPolicy: cdk.RemovalPolicy.DESTROY,
       autoDeleteObjects: true
     } )
 
-    siteBucket.addToResourcePolicy(new cdk.aws_iam.PolicyStatement({
+    const cloudFrontOAI = new cloudfront.OriginAccessIdentity(this, "ShopSite-OAI")
+
+    siteBucket.addToResourcePolicy(new iam.PolicyStatement({
       actions: ["S3:GetObject"],
       resources: [siteBucket.arnForObjects("*")],
-      principals:[new cdk.aws_iam.CanonicalUserPrincipal(cloudFrontOAI.cloudFrontOriginAccessIdentityS3CanonicalUserId)]
+      principals:[new iam.CanonicalUserPrincipal(cloudFrontOAI.cloudFrontOriginAccessIdentityS3CanonicalUserId)]
     }))
 
-    const distribution = new cdk.aws_cloudfront.CloudFrontWebDistribution(this, "ShopSite-Distribution", {
+    const distribution = new cloudfront.CloudFrontWebDistribution(this, "ShopSite-Distribution", {
       originConfigs: [
         {
           s3OriginSource: {
@@ -41,8 +44,8 @@ export class ShopSiteStack extends cdk.Stack {
       ]
     })
 
-    new cdk.aws_s3_deployment.BucketDeployment(this, "SiteShop-Bucket-Deployment", {
-      sources: [cdk.aws_s3_deployment.Source.asset("../dist")],
+    new s3deployment.BucketDeployment(this, "SiteShop-Bucket-Deployment", {
+      sources: [s3deployment.Source.asset("../dist")],
       destinationBucket: siteBucket,
       distribution: distribution,
       distributionPaths: ["/*"]
