@@ -2,16 +2,16 @@ import * as cdk from 'aws-cdk-lib';
 import * as s3 from 'aws-cdk-lib/aws-s3';
 import * as origins from 'aws-cdk-lib/aws-cloudfront-origins'; // The CloudFront Origins CDK Library
 import * as cloudfront from 'aws-cdk-lib/aws-cloudfront';
-import * as iam from 'aws-cdk-lib/aws-iam';
+//import * as iam from 'aws-cdk-lib/aws-iam';
 import * as s3deployment from 'aws-cdk-lib/aws-s3-deployment';
 import { Construct } from 'constructs';
 import { API_PATHS, appName, taskNum } from './constants/cdk-constants';
 import { S3AccessPolicy } from './cdk-s3-policy';
-import { BEHAVIORS } from './config/cdk-ws-cache';
-import { ComparePolicies, Policies } from './cdk-cache-policy';
-import { IOrigin } from 'aws-cdk-lib/aws-cloudfront';
-import { REDIRECTS } from './config/cdk-ws-redirect';
-import { createRedirectFunction } from './functions/cdk-redirect';
+//import { BEHAVIORS } from './config/cdk-ws-cache';
+//import { ComparePolicies, Policies } from './cdk-cache-policy';
+//import { IOrigin } from 'aws-cdk-lib/aws-cloudfront';
+//import { REDIRECTS } from './config/cdk-ws-redirect';
+//import { createRedirectFunction } from './functions/cdk-redirect';
 //import * as lambda from 'aws-cdk-lib/aws-lambda'; // The Lambda CDK Library !!!Only for 'us-east-1' region
 
 
@@ -32,6 +32,7 @@ export class ShopSiteStack extends cdk.Stack {
       originAccessIdentity: new S3AccessPolicy(this, siteBucket).accessIdentity,
     });
 
+/*
     const apiOrigin = new origins.HttpOrigin(API_PATHS.s3);
 
     const originsCreated: { [id: string]: IOrigin; } = {
@@ -39,16 +40,16 @@ export class ShopSiteStack extends cdk.Stack {
       "api": apiOrigin,
     }
 
-    //const onlyDesktop = new lambda.Function(this, 'onlyDesktop', {
-    //  runtime: lambda.Runtime.NODEJS_16_X,
-    //  handler: 'cdk-onlydesktop.handler',                    // File name that contains our function
-    //  code: lambda.Code.fromAsset('./lib/functions'),    // Location of File
-    //});
+    const onlyDesktop = new lambda.Function(this, 'onlyDesktop', {
+      runtime: lambda.Runtime.NODEJS_LATEST,
+      handler: 'cdk-onlydesktop.handler',                    // File name that contains our function
+      code: lambda.Code.fromAsset('./lib/functions'),    // Location of File
+    }); 
     
-    //const customOriginRequestPolicy = new cloudfront.OriginRequestPolicy(this, 'customOriginRequestPolicy', {
-    //  headerBehavior: cloudfront.OriginRequestHeaderBehavior.allowList('CloudFront-Is-Desktop-Viewer'),
-    //}); 
-
+    const customOriginRequestPolicy = new cloudfront.OriginRequestPolicy(this, 'customOriginRequestPolicy', {
+      headerBehavior: cloudfront.OriginRequestHeaderBehavior.allowList('CloudFront-Is-Desktop-Viewer'),
+    }); 
+*/
     
     const distribution = new cloudfront.Distribution( this, `${appName}-${taskNum}-Distribution`, {
       defaultBehavior: {
@@ -58,6 +59,7 @@ export class ShopSiteStack extends cdk.Stack {
       },
       defaultRootObject: "index.html",
       
+/*      
       additionalBehaviors: {
         'api/*': {
           origin: apiOrigin,
@@ -68,19 +70,21 @@ export class ShopSiteStack extends cdk.Stack {
           cachePolicy: cloudfront.CachePolicy.CACHING_DISABLED,
 
           // Add the origin request policy as such:
-          //originRequestPolicy: customOriginRequestPolicy,
+          originRequestPolicy: customOriginRequestPolicy,
 
           // Add the Lambda@Edge function as such:
-          //edgeLambdas: [{
-          //  functionVersion: onlyDesktop.currentVersion,
-          //  eventType: cloudfront.LambdaEdgeEventType.ORIGIN_RESPONSE,  // Origin Response
-          //}],    
+          edgeLambdas: [{
+            functionVersion: onlyDesktop.currentVersion,
+            eventType: cloudfront.LambdaEdgeEventType.ORIGIN_RESPONSE,  // Origin Response
+          }],    
         }
       }
- 
+*/
+
     }
     )
 
+/*    
     // Create a Policies list that will eventually contain all created Policies objects
     const policies: Policies[] = [];
 
@@ -129,6 +133,7 @@ export class ShopSiteStack extends cdk.Stack {
           }],
         });
     }
+*/
 
     new s3deployment.BucketDeployment(this, `${appName}-${taskNum}-S3-Deployment`, {
       sources: [s3deployment.Source.asset("../dist")],
