@@ -21,8 +21,8 @@ export class ShopSiteStack extends cdk.Stack {
 
     // The code that defines your stack goes here
 
-    const siteBucket = new s3.Bucket( this, `${appName}-${taskNum}-S3`, {
-      bucketName: `bv-eu-north-1-rss-${taskNum}`,
+    const siteBucket = new s3.Bucket( this, `${appName}-${taskNum}-Bucket`, {
+      bucketName: `siteshop-${taskNum}`,
       //websiteIndexDocument: "index.html",     //commented, S3 is not httpOrigin and moved to the Distribution.defaultRootObject
       removalPolicy: cdk.RemovalPolicy.DESTROY,
       autoDeleteObjects: true
