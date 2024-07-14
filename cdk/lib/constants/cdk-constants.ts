@@ -1,5 +1,5 @@
 const appName = "ShopSite";
-const taskNum = "511"
+const taskNum = "711"
 
 const DOMANE_NAME = "execute-api.eu-north-1.amazonaws.com"
 
