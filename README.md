@@ -17,22 +17,32 @@ This is frontend starter project for nodejs-aws mentoring program. It uses the f
 
 ## Available Scripts
 
-### `start`
-
-Starts the project in dev mode with mocked API on local environment.
-
-### `build`
+### `npm run build`
 
 Builds the project for production in `dist` folder.
 
-### `preview`
+### `npm run deploy`
 
-Starts the project in production mode on local environment.
+Build and deploy the project to AWS Cloud.
 
-### `test`, `test:ui`, `test:coverage`
+### `npm run destroy`
 
-Runs tests in console, in browser or with coverage.
+Destroy the project on AWS Cloud.
 
-### `lint`, `prettier`
+# The task ([Serve SPA in AWS S3 and Cloudfront Services](https://github.com/rolling-scopes-school/aws/blob/main/aws-developer/02_serving_spa/task.md)) results:
 
-Runs linting and formatting for all files in `src` folder.
+## Basic Scope. Manual Deployment
+### 1) Create and configure S3 bucket:
+ The app has been uploaded to the bucket and is available though the Internet. Nothing else has been done.
+ Link to S3 bucket: https://bb-en1-rss-211.s3.eu-north-1.amazonaws.com/index.html
+ 
+ ### 2) Create and configure CloudFront distribution:
+ The site is served now with CloudFront and is available through the Internet over CloudFront URL, not S3-website link.
+ S3-website shows 403 Access Denied error.
+ Link to CloudFront: https://d1ub7l8p4olbz4.cloudfront.net/
+ Link to S3 bucket: https://bb-en1-rss-212.s3.eu-north-1.amazonaws.com/index.html
+
+## Advanced Scope. Automated Deployment
+### S3 bucket creation, website deployment, CloudFront Distribution and Invalidation added and configured by using AWS CDK:
+ Link to CloudFront: https://d2tsw9z2z885cs.cloudfront.net
+ Link to S3 bucket: https://bv-eu-north-1-rss-221.s3.eu-north-1.amazonaws.com/index.html
