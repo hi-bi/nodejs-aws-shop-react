@@ -1,5 +1,6 @@
 import * as Yup from "yup";
 import { OrderStatus } from "~/constants/order";
+import { CartItemSchema } from "./CartItem";
 
 export const AddressSchema = Yup.object({
   firstName: Yup.string().required().default(""),
@@ -9,13 +10,6 @@ export const AddressSchema = Yup.object({
 }).defined();
 
 export type Address = Yup.InferType<typeof AddressSchema>;
-
-export const OrderItemSchema = Yup.object({
-  productId: Yup.string().required(),
-  count: Yup.number().integer().positive().required(),
-}).defined();
-
-export type OrderItem = Yup.InferType<typeof OrderItemSchema>;
 
 export const statusHistorySchema = Yup.object({
   status: Yup.mixed<OrderStatus>().oneOf(Object.values(OrderStatus)).required(),
@@ -27,9 +21,10 @@ export type statusHistory = Yup.InferType<typeof statusHistorySchema>;
 
 export const OrderSchema = Yup.object({
   id: Yup.string().required(),
-  items: Yup.array().of(OrderItemSchema).defined(),
-  address: AddressSchema.required(),
+  items: Yup.array().of(CartItemSchema).defined(),
+  delivery: AddressSchema.required(),
   statusHistory: Yup.array().of(statusHistorySchema).defined(),
 }).defined();
 
 export type Order = Yup.InferType<typeof OrderSchema>;
+export type OrderDto = Pick<Order, "items" | "delivery">;

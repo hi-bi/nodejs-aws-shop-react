@@ -3,7 +3,7 @@ import React from "react";
 import { useQuery, useQueryClient, useMutation } from "react-query";
 import API_PATHS from "~/constants/apiPaths";
 import { OrderStatus } from "~/constants/order";
-import { Order } from "~/models/Order";
+import { Order, OrderDto } from "~/models/Order";
 
 export function useOrders() {
   return useQuery<Order[], AxiosError>("orders", async () => {
@@ -34,12 +34,16 @@ export function useUpdateOrderStatus() {
 }
 
 export function useSubmitOrder() {
-  return useMutation((values: Omit<Order, "id">) => {
-    return axios.put<Omit<Order, "id">>(`${API_PATHS.order}/order`, values, {
-      headers: {
-        Authorization: `Basic ${localStorage.getItem("authorization_token")}`,
-      },
-    });
+  return useMutation((order: OrderDto) => {
+    return axios.post<Order>(
+      `${API_PATHS.order}/profile/cart/checkout`,
+      order,
+      {
+        headers: {
+          Authorization: `Basic ${localStorage.getItem("authorization_token")}`,
+        },
+      }
+    );
   });
 }
 

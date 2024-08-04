@@ -1,6 +1,8 @@
 import React from "react";
 import Typography from "@mui/material/Typography";
 import Box from "@mui/material/Box";
+import axios from "axios";
+import { toast } from 'react-toastify';
 
 type CSVFileImportProps = {
   url: string;
@@ -22,25 +24,35 @@ export default function CSVFileImport({ url, title }: CSVFileImportProps) {
     setFile(undefined);
   };
 
+  const fileName = (file?.name === undefined) ?  '' : file?.name;
+  
   const uploadFile = async () => {
     console.log("uploadFile to", url);
 
     // Get the presigned URL
-    // const response = await axios({
-    //   method: "GET",
-    //   url,
-    //   params: {
-    //     name: encodeURIComponent(file.name),
-    //   },
-    // });
-    // console.log("File to upload: ", file.name);
-    // console.log("Uploading to: ", response.data);
-    // const result = await fetch(response.data, {
-    //   method: "PUT",
-    //   body: file,
-    // });
-    // console.log("Result: ", result);
-    // setFile("");
+    const response = await axios({
+      method: "GET",
+      url,
+      params: {
+        name: encodeURIComponent(fileName),
+      },
+      headers: {
+      Authorization: `Basic ${localStorage.getItem("authorization_token")}`
+      }
+    }).catch(err => {
+      toast.error('Authorization error: check credentials');
+    });
+
+    if (response) {
+      console.log("File to upload: ", fileName);
+      console.log("Uploading to: ", response.data);
+      const result = await fetch(response.data, {
+        method: "PUT",
+        body: file,
+      });
+      console.log("Result: ", result);
+      setFile(undefined);
+    }
   };
   return (
     <Box>

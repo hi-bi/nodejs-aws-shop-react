@@ -1,11 +1,11 @@
 import React from "react";
-import { Order, OrderItem } from "~/models/Order";
+import { Order } from "~/models/Order";
 import axios from "axios";
 import { useParams } from "react-router-dom";
 import PaperLayout from "~/components/PaperLayout/PaperLayout";
 import Typography from "@mui/material/Typography";
 import API_PATHS from "~/constants/apiPaths";
-import { CartItem } from "~/models/CartItem";
+import { CartItem, CartProductItem } from "~/models/CartItem";
 import { AvailableProduct } from "~/models/Product";
 import ReviewOrder from "~/components/pages/PageCart/components/ReviewOrder";
 import { OrderStatus, ORDER_STATUS_FLOW } from "~/constants/order";
@@ -55,14 +55,18 @@ export default function PageOrder() {
   ] = results;
   const { mutateAsync: updateOrderStatus } = useUpdateOrderStatus();
   const invalidateOrder = useInvalidateOrder();
-  const cartItems: CartItem[] = React.useMemo(() => {
+  const cartProductsItems: CartProductItem[] = React.useMemo(() => {
     if (order && products) {
-      return order.items.map((item: OrderItem) => {
-        const product = products.find((p) => p.id === item.productId);
+      return order.items.map((item: CartItem) => {
+        const product = products.find((p) => p.id === item.product_id);
         if (!product) {
           throw new Error("Product not found");
         }
-        return { product, count: item.count };
+        const cartProductItem: CartProductItem = {
+          product,
+          ...item,
+        };
+        return cartProductItem;
       });
     }
     return [];
@@ -79,7 +83,7 @@ export default function PageOrder() {
       <Typography component="h1" variant="h4" align="center">
         Manage order
       </Typography>
-      <ReviewOrder address={order.address} items={cartItems} />
+      <ReviewOrder address={order.delivery} items={cartProductsItems} />
       <Typography variant="h6">Status:</Typography>
       <Typography variant="h6" color="primary">
         {lastStatusItem?.status.toUpperCase()}

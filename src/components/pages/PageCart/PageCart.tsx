@@ -7,11 +7,13 @@ import Typography from "@mui/material/Typography";
 import ReviewCart from "~/components/pages/PageCart/components/ReviewCart";
 import ReviewOrder from "~/components/pages/PageCart/components/ReviewOrder";
 import PaperLayout from "~/components/PaperLayout/PaperLayout";
-import { Address, AddressSchema, Order } from "~/models/Order";
+import { Address, AddressSchema, OrderDto } from "~/models/Order";
 import Box from "@mui/material/Box";
 import { useCart, useInvalidateCart } from "~/queries/cart";
 import AddressForm from "~/components/pages/PageCart/components/AddressForm";
 import { useSubmitOrder } from "~/queries/orders";
+import { useAvailableProducts } from "~/queries/products";
+import { CartItem, CartProductItem } from "~/models/CartItem";
 
 enum CartStep {
   ReviewCart,
@@ -43,30 +45,49 @@ const Success = () => (
 const steps = ["Review your cart", "Shipping address", "Review your order"];
 
 export default function PageCart() {
-  const { data = [] } = useCart();
+  const { data: cartItems = [] } = useCart();
+  const { data: products = [] } = useAvailableProducts();
+
   const { mutate: submitOrder } = useSubmitOrder();
   const invalidateCart = useInvalidateCart();
   const [activeStep, setActiveStep] = React.useState<CartStep>(
     CartStep.ReviewCart
   );
-  const [address, setAddress] = useState<Address>(initialAddressValues);
+  const [delivery, setDelivery] = useState<Address>(initialAddressValues);
 
-  const isCartEmpty = data.length === 0;
+  const isCartEmpty = cartItems.length === 0;
+
+  const cartProductsItems: CartProductItem[] = React.useMemo(() => {
+    if (cartItems && products) {
+      return cartItems.map((item: CartItem) => {
+        const product = products.find((p) => p.id === item.product_id);
+        if (!product) {
+          throw new Error("Product not found");
+        }
+        const cartProductItem: CartProductItem = {
+          product,
+          ...item,
+        };
+        return cartProductItem;
+      });
+    }
+    return [];
+  }, [cartItems, products]);
 
   const handleNext = () => {
     if (activeStep !== CartStep.ReviewOrder) {
       setActiveStep((step) => step + 1);
       return;
     }
-    const values = {
-      items: data.map((i) => ({
-        productId: i.product.id,
-        count: i.count,
+    const order: OrderDto = {
+      items: cartItems.map((item) => ({
+        product_id: item.product_id,
+        count: item.count,
       })),
-      address,
+      delivery,
     };
 
-    submitOrder(values as Omit<Order, "id">, {
+    submitOrder(order, {
       onSuccess: () => {
         setActiveStep(activeStep + 1);
         invalidateCart();
@@ -79,7 +100,7 @@ export default function PageCart() {
   };
 
   const handleAddressSubmit = (values: Address) => {
-    setAddress(values);
+    setDelivery(values);
     handleNext();
   };
 
@@ -100,17 +121,17 @@ export default function PageCart() {
       </Stepper>
       {isCartEmpty && <CartIsEmpty />}
       {!isCartEmpty && activeStep === CartStep.ReviewCart && (
-        <ReviewCart items={data} />
+        <ReviewCart items={cartProductsItems} />
       )}
       {activeStep === CartStep.Address && (
         <AddressForm
-          initialValues={address}
+          initialValues={delivery}
           onBack={handleBack}
           onSubmit={handleAddressSubmit}
         />
       )}
       {activeStep === CartStep.ReviewOrder && (
-        <ReviewOrder address={address} items={data} />
+        <ReviewOrder address={delivery} items={cartProductsItems} />
       )}
       {activeStep === CartStep.Success && <Success />}
       {!isCartEmpty &&
