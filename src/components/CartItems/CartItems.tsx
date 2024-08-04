@@ -2,12 +2,12 @@ import Typography from "@mui/material/Typography";
 import List from "@mui/material/List";
 import ListItem from "@mui/material/ListItem";
 import ListItemText from "@mui/material/ListItemText";
-import { CartItem } from "~/models/CartItem";
+import { CartProductItem } from "~/models/CartItem";
 import { formatAsPrice } from "~/utils/utils";
 import AddProductToCart from "~/components/AddProductToCart/AddProductToCart";
 
 type CartItemsProps = {
-  items: CartItem[];
+  items: CartProductItem[];
   isEditable: boolean;
 };
 
@@ -20,10 +20,10 @@ export default function CartItems({ items, isEditable }: CartItemsProps) {
   return (
     <>
       <List disablePadding>
-        {items.map((cartItem: CartItem) => (
+        {items.map((cartItem: CartProductItem) => (
           <ListItem
             sx={{ padding: (theme) => theme.spacing(1, 0) }}
-            key={cartItem.product.id}
+            key={cartItem.product_id}
           >
             {isEditable && <AddProductToCart product={cartItem.product} />}
             <ListItemText
